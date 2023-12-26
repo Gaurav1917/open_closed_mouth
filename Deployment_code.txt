@@ -1,0 +1,17 @@
+from tensorflow import keras
+import gradio as gr
+
+loaded_model = keras.models.load_model("./Model.h5")
+loaded_model.load_weights("./Model.h5")
+categories = ['closed mouth','open mouth']
+
+def predict_image(img):
+  img_reshape = img.reshape(1,60,60,3)
+  prediction=loaded_model.predict(img_reshape)[0]
+  return {categories[i]: float(prediction[i]) for i in range(2)}
+     
+
+image = gr.inputs.Image(shape=(60,60))
+label = gr.outputs.Label(num_top_classes=2)
+
+gr.Interface(fn=predict_image,inputs=image,outputs=label,capture_session=True,theme='Arkaine/Carl_Glow',title='Mouth State Detector').launch(debug='True')
